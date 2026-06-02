@@ -1,0 +1,318 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Usuarios</h1>
+      <p>Administra los usuarios del sistema</p>
+    </div>
+    <p-button
+      label="Nuevo Usuario"
+      icon="pi pi-plus"
+      (onClick)="abrirNuevo()"
+    />
+  </div>
+
+  <p-card>
+    <div class="table-toolbar">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          type="text"
+          pInputText
+          placeholder="Buscar por nombre o email..."
+          [value]="busqueda()"
+          (input)="busqueda.set($any($event.target).value)"
+        />
+      </p-iconfield>
+    </div>
+
+    <p-table
+      [value]="usuariosFiltrados"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5, 10, 20]"
+      styleClass="p-datatable-striped p-datatable-gridlines"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Roles</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-usuario>
+        <tr>
+          <td>{{ usuario.nombre }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>
+            <div class="roles-tags">
+              <p-tag
+                *ngFor="let rol of usuario.roles"
+                [value]="rol"
+                severity="info"
+              />
+            </div>
+          </td>
+          <td>
+            <p-tag
+              [value]="usuario.estado ? 'Activo' : 'Inactivo'"
+              [severity]="usuario.estado ? 'success' : 'danger'"
+            />
+          </td>
+          <td>
+            <div class="actions">
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                severity="info"
+                pTooltip="Editar"
+                (onClick)="abrirEditar(usuario)"
+              />
+              <p-button
+                icon="pi pi-shield"
+                [text]="true"
+                severity="warn"
+                pTooltip="Gestionar roles"
+                (onClick)="abrirRoles(usuario)"
+              />
+              <p-button
+                icon="pi pi-lock"
+                [text]="true"
+                severity="secondary"
+                pTooltip="Cambiar contraseña"
+                (onClick)="abrirPassword(usuario)"
+              />
+              @if (usuario.estado) {
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true"
+                  severity="danger"
+                  pTooltip="Desactivar"
+                  (onClick)="confirmarEliminar(usuario)"
+                />
+              } @else {
+                <p-button
+                  icon="pi pi-check"
+                  [text]="true"
+                  severity="success"
+                  pTooltip="Activar"
+                  (onClick)="confirmarActivar(usuario)"
+                />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="empty-message">No hay usuarios registrados.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>
+
+<p-confirmDialog />
+
+<p-dialog
+  [header]="esNuevo ? 'Nuevo Usuario' : 'Editar Usuario'"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+>
+  @if (esNuevo) {
+    <form [formGroup]="createForm">
+      <div class="field">
+        <label>Nombre completo</label>
+        <input
+          type="text"
+          pInputText
+          formControlName="nombre"
+          placeholder="Nombre completo"
+          class="w-full"
+          [class.ng-invalid]="createForm.controls.nombre.invalid && createForm.controls.nombre.touched"
+        />
+        @if (createForm.controls.nombre.touched && createForm.controls.nombre.errors?.['required']) {
+          <small class="error">El nombre es obligatorio.</small>
+        }
+      </div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input
+          type="email"
+          pInputText
+          formControlName="email"
+          placeholder="correo@ejemplo.com"
+          class="w-full"
+          [class.ng-invalid]="createForm.controls.email.invalid && createForm.controls.email.touched"
+        />
+        @if (createForm.controls.email.touched) {
+          @if (createForm.controls.email.errors?.['required']) {
+            <small class="error">El correo es obligatorio.</small>
+          } @else if (createForm.controls.email.errors?.['email']) {
+            <small class="error">Ingrese un correo válido.</small>
+          }
+        }
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <p-password
+          formControlName="password"
+          placeholder="Contraseña"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="w-full"
+          [inputStyle]="{'width': '100%'}"
+          [class.ng-invalid]="createForm.controls.password.invalid && createForm.controls.password.touched"
+        />
+        @if (createForm.controls.password.touched && createForm.controls.password.errors?.['required']) {
+          <small class="error">La contraseña es obligatoria.</small>
+        }
+      </div>
+      <div class="field">
+        <label>Roles</label>
+        <p-multiselect
+          [formControl]="createForm.controls.rolesIds"
+          [options]="roles()"
+          optionLabel="nombre"
+          optionValue="id"
+          placeholder="Seleccione roles"
+          styleClass="w-full"
+        />
+        @if (createForm.controls.rolesIds.touched && createForm.controls.rolesIds.errors?.['required']) {
+          <small class="error">Seleccione al menos un rol.</small>
+        }
+      </div>
+    </form>
+  } @else {
+    <form [formGroup]="updateForm">
+      <div class="field">
+        <label>Nombre completo</label>
+        <input
+          type="text"
+          pInputText
+          formControlName="nombre"
+          placeholder="Nombre completo"
+          class="w-full"
+          [class.ng-invalid]="updateForm.controls.nombre.invalid && updateForm.controls.nombre.touched"
+        />
+        @if (updateForm.controls.nombre.touched && updateForm.controls.nombre.errors?.['required']) {
+          <small class="error">El nombre es obligatorio.</small>
+        }
+      </div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input
+          type="email"
+          pInputText
+          formControlName="email"
+          placeholder="correo@ejemplo.com"
+          class="w-full"
+          [class.ng-invalid]="updateForm.controls.email.invalid && updateForm.controls.email.touched"
+        />
+        @if (updateForm.controls.email.touched) {
+          @if (updateForm.controls.email.errors?.['required']) {
+            <small class="error">El correo es obligatorio.</small>
+          } @else if (updateForm.controls.email.errors?.['email']) {
+            <small class="error">Ingrese un correo válido.</small>
+          }
+        }
+      </div>
+    </form>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="dialogVisible.set(false)" />
+    <p-button
+      label="Guardar"
+      icon="pi pi-save"
+      [loading]="loading()"
+      [disabled]="esNuevo ? createForm.invalid : updateForm.invalid"
+      (onClick)="guardar()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Cambiar Contraseña"
+  [(visible)]="passwordDialogVisible"
+  [modal]="true"
+  [style]="{ width: '420px' }"
+  [draggable]="false"
+>
+  <form [formGroup]="passwordForm">
+    <div class="field">
+      <label>Contraseña actual</label>
+      <p-password
+        formControlName="passwordActual"
+        placeholder="Contraseña actual"
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="w-full"
+        [inputStyle]="{'width': '100%'}"
+      />
+      @if (passwordForm.controls.passwordActual.touched && passwordForm.controls.passwordActual.errors?.['required']) {
+        <small class="error">La contraseña actual es obligatoria.</small>
+      }
+    </div>
+    <div class="field">
+      <label>Nueva contraseña</label>
+      <p-password
+        formControlName="passwordNuevo"
+        placeholder="Nueva contraseña"
+        [feedback]="true"
+        [toggleMask]="true"
+        styleClass="w-full"
+        [inputStyle]="{'width': '100%'}"
+      />
+      @if (passwordForm.controls.passwordNuevo.touched && passwordForm.controls.passwordNuevo.errors?.['required']) {
+        <small class="error">La nueva contraseña es obligatoria.</small>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="passwordDialogVisible.set(false)" />
+    <p-button
+      label="Cambiar"
+      icon="pi pi-lock"
+      [loading]="loading()"
+      [disabled]="passwordForm.invalid"
+      (onClick)="guardarPassword()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [header]="'Roles de ' + (usuarioSeleccionado()?.nombre ?? '')"
+  [(visible)]="rolesDialogVisible"
+  [modal]="true"
+  [style]="{ width: '420px' }"
+  [draggable]="false"
+>
+  <div class="field">
+    <label>Roles asignados</label>
+    <p-multiselect
+      [formControl]="rolesControl"
+      [options]="roles()"
+      optionLabel="nombre"
+      optionValue="id"
+      placeholder="Seleccione roles"
+      styleClass="w-full"
+    />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="rolesDialogVisible.set(false)" />
+    <p-button
+      label="Guardar"
+      icon="pi pi-save"
+      [loading]="loading()"
+      (onClick)="guardarRoles()"
+    />
+  </ng-template>
+</p-dialog>

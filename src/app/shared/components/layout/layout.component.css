@@ -1,0 +1,151 @@
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-main);
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.brand i {
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  display: none;
+}
+.menu-item.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 700;
+}
+
+.menu-item.active i {
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .user-name {
+    display: inline;
+  }
+}
+
+:host ::ng-deep .p-avatar {
+  background: var(--primary-light) !important;
+  color: white !important;
+  font-weight: 700;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+:host ::ng-deep .navbar .p-button {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+:host ::ng-deep .navbar .p-button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.layout-content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .layout-content {
+    padding: 1rem;
+  }
+}
+
+.drawer-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.menu-item i {
+  font-size: 1.1rem;
+  width: 1.25rem;
+  text-align: center;
+}
+
+.drawer-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.drawer-footer:hover {
+  background: rgba(255, 59, 59, 0.2);
+  color: #ff6b6b;
+}
+
+.drawer-footer i {
+  font-size: 1.1rem;
+}

@@ -1,1 +1,60 @@
-/* You can add global styles to this file, and also import other style files */
+@import "primeicons/primeicons.css";
+
+:root {
+  --primary: #1e3a5f;
+  --primary-light: #2d6a9f;
+  --primary-dark: #152a45;
+  --accent: #3b82f6;
+  --bg-main: #f0f4f8;
+  --bg-card: #ffffff;
+  --text-primary: #1e3a5f;
+  --text-secondary: #6c757d;
+  --border: #e2e8f0;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f97316;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+}
+
+/* Drawer global styles */
+.custom-drawer {
+  background: var(--primary) !important;
+}
+
+.custom-drawer .p-drawer-header {
+  background: var(--primary) !important;
+  color: white !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem 1.5rem;
+}
+
+.custom-drawer .p-drawer-title {
+  color: white !important;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.custom-drawer .p-drawer-close-button {
+  color: white !important;
+}
+
+.custom-drawer .p-drawer-close-button:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+}
+
+.custom-drawer .p-drawer-content {
+  background: var(--primary) !important;
+  padding: 1rem;
+}

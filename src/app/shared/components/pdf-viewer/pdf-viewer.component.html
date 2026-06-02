@@ -1,0 +1,40 @@
+<p-dialog
+  [header]="titulo()"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '90vw', height: '90vh' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="pdf-dialog"
+  (onHide)="cerrar()"
+>
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <span class="dialog-titulo">{{ titulo() }}</span>
+      <div class="dialog-actions">
+        <p-button
+          icon="pi pi-download"
+          label="Descargar"
+          [text]="true"
+          severity="info"
+          (onClick)="descargar()"
+        />
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="viewer-container">
+    @if (cargando()) {
+      <div class="loading">
+        <p-progressspinner strokeWidth="4" />
+        <span>Cargando documento...</span>
+      </div>
+    }
+    <iframe
+      [src]="url() | safe"
+      [class.hidden]="cargando()"
+      (load)="onCargado()"
+      frameborder="0"
+    ></iframe>
+  </div>
+</p-dialog>

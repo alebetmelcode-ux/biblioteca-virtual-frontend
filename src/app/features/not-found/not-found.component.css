@@ -1,0 +1,57 @@
+.not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+  padding: 1rem;
+}
+
+.content {
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.code {
+  font-size: 8rem;
+  font-weight: 900;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.15);
+  letter-spacing: -0.5rem;
+}
+
+.icon {
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: -3rem;
+}
+
+.icon i {
+  font-size: 4rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .code {
+    font-size: 5rem;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+}

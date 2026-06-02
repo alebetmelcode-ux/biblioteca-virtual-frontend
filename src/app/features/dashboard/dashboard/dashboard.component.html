@@ -1,0 +1,130 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Bienvenido, {{ userName }}</h1>
+    <p>Panel de control de la Biblioteca Virtual</p>
+  </div>
+
+  <div class="stats-grid">
+    <p-card styleClass="stat-card stat-card--blue">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-label">Total Documentos</span>
+          @if (loading()) {
+            <p-skeleton width="4rem" height="2rem" />
+          } @else {
+            <span class="stat-value">{{ totalDocumentos() }}</span>
+          }
+        </div>
+        <div class="stat-icon stat-icon--blue">
+          <i class="pi pi-file-pdf"></i>
+        </div>
+      </div>
+      <p-button
+        label="Ver documentos"
+        [text]="true"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        (onClick)="irADocumentos()"
+        styleClass="stat-btn"
+      />
+    </p-card>
+
+    <p-card styleClass="stat-card stat-card--green">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-label">Total Categorías</span>
+          @if (loading()) {
+            <p-skeleton width="4rem" height="2rem" />
+          } @else {
+            <span class="stat-value">{{ totalCategorias() }}</span>
+          }
+        </div>
+        <div class="stat-icon stat-icon--green">
+          <i class="pi pi-tags"></i>
+        </div>
+      </div>
+      @if (isAdmin) {
+        <p-button
+          label="Ver categorías"
+          [text]="true"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          (onClick)="irACategorias()"
+          styleClass="stat-btn"
+        />
+      }
+    </p-card>
+
+    @if (isAdmin) {
+      <p-card styleClass="stat-card stat-card--orange">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-label">Total Usuarios</span>
+            @if (loading()) {
+              <p-skeleton width="4rem" height="2rem" />
+            } @else {
+              <span class="stat-value">{{ totalUsuarios() }}</span>
+            }
+          </div>
+          <div class="stat-icon stat-icon--orange">
+            <i class="pi pi-users"></i>
+          </div>
+        </div>
+        <p-button
+          label="Ver usuarios"
+          [text]="true"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          (onClick)="irAUsuarios()"
+          styleClass="stat-btn"
+        />
+      </p-card>
+    }
+  </div>
+
+  <p-card styleClass="recent-card">
+    <ng-template pTemplate="header">
+      <div class="recent-header">
+        <h2>Documentos recientes</h2>
+        <p-button
+          label="Ver todos"
+          [text]="true"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          (onClick)="irADocumentos()"
+        />
+      </div>
+    </ng-template>
+
+    @if (loading()) {
+      <div class="skeleton-list">
+        @for (item of [1,2,3,4,5]; track item) {
+          <p-skeleton height="3rem" styleClass="mb-2" />
+        }
+      </div>
+    } @else if (ultimosDocumentos().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <p>No hay documentos disponibles</p>
+      </div>
+    } @else {
+      <div class="doc-list">
+        @for (doc of ultimosDocumentos(); track doc.id) {
+          <div class="doc-item">
+            <div class="doc-icon">
+              <i class="pi pi-file-pdf"></i>
+            </div>
+            <div class="doc-info">
+              <span class="doc-title">{{ doc.titulo }}</span>
+              <span class="doc-category">{{ doc.nombreCategoria }}</span>
+            </div>
+            <p-tag
+              [value]="doc.estado ? 'Activo' : 'Inactivo'"
+              [severity]="doc.estado ? 'success' : 'danger'"
+            />
+          </div>
+        }
+      </div>
+    }
+  </p-card>
+</div>

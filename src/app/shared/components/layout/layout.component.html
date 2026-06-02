@@ -1,0 +1,60 @@
+<div class="layout-wrapper">
+  <nav class="navbar">
+    <div class="navbar-left">
+      <p-button
+        icon="pi pi-bars"
+        [text]="true"
+        severity="secondary"
+        (onClick)="drawerVisible.set(true)"
+      />
+      <div class="brand">
+        <i class="pi pi-book"></i>
+        <span>Biblioteca Virtual</span>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <span class="user-name">{{ userName }}</span>
+      <p-avatar
+        [label]="userName.charAt(0).toUpperCase()"
+        shape="circle"
+      />
+      <p-button
+        icon="pi pi-sign-out"
+        [text]="true"
+        severity="danger"
+        pTooltip="Cerrar sesión"
+        tooltipPosition="bottom"
+        (onClick)="confirmarLogout()"
+      />
+    </div>
+  </nav>
+
+  <p-drawer
+    [(visible)]="drawerVisible"
+    header="Biblioteca Virtual"
+    styleClass="custom-drawer"
+  >
+    <div class="drawer-menu">
+      <div
+        class="menu-item"
+        *ngFor="let item of menuItems"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+      >
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </div>
+    </div>
+
+    <div class="drawer-footer" (click)="confirmarLogout()">
+      <i class="pi pi-sign-out"></i>
+      <span>Cerrar sesión</span>
+    </div>
+  </p-drawer>
+
+  <main class="layout-content">
+    <router-outlet />
+  </main>
+</div>
+
+<p-confirmDialog />

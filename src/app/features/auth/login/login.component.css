@@ -1,0 +1,73 @@
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+  padding: 1rem;
+}
+
+:host ::ng-deep .p-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+  text-align: center;
+  padding: 2rem 2rem 0;
+}
+
+.login-icon {
+  font-size: 3rem;
+  color: #2d6a9f;
+  margin-bottom: 0.5rem;
+}
+
+.login-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.login-header p {
+  color: #6c757d;
+  margin: 0 0 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.field label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.field input,
+.field p-password,
+:host ::ng-deep .p-password,
+:host ::ng-deep .p-password input {
+  width: 100%;
+}
+
+:host ::ng-deep .p-button {
+  width: 100%;
+  justify-content: center;
+}
+
+.error {
+  color: #e24c4c;
+  font-size: 0.8rem;
+}
+:host ::ng-deep .session-msg {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  width: 100%;
+}

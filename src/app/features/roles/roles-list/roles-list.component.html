@@ -1,0 +1,152 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Roles</h1>
+      <p>Administra los roles del sistema</p>
+    </div>
+    <p-button
+      label="Nuevo Rol"
+      icon="pi pi-plus"
+      (onClick)="abrirNuevo()"
+    />
+  </div>
+
+  <p-card>
+    <div class="table-toolbar">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          type="text"
+          pInputText
+          placeholder="Buscar rol..."
+          [value]="busqueda()"
+          (input)="busqueda.set($any($event.target).value)"
+        />
+      </p-iconfield>
+    </div>
+
+    @if (loading()) {
+      <div class="skeleton-table">
+        @for (item of [1,2,3,4,5]; track item) {
+          <div class="skeleton-row">
+            <p-skeleton width="3rem" height="1.2rem" />
+            <p-skeleton width="10rem" height="1.2rem" />
+            <p-skeleton width="5rem" height="1.2rem" borderRadius="16px" />
+            <p-skeleton width="5rem" height="1.2rem" />
+          </div>
+        }
+      </div>
+    } @else {
+      <p-table
+        [value]="rolesFiltrados"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        styleClass="p-datatable-striped p-datatable-gridlines"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rol>
+          <tr>
+            <td>{{ rol.id }}</td>
+            <td>{{ rol.nombre }}</td>
+            <td>
+              <p-tag
+                [value]="rol.estado ? 'Activo' : 'Inactivo'"
+                [severity]="rol.estado ? 'success' : 'danger'"
+              />
+            </td>
+            <td>
+              <div class="actions">
+                <p-button
+                  icon="pi pi-pencil"
+                  [text]="true"
+                  severity="info"
+                  pTooltip="Editar"
+                  (onClick)="abrirEditar(rol)"
+                />
+                @if (rol.estado) {
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    severity="danger"
+                    pTooltip="Desactivar"
+                    (onClick)="confirmarEliminar(rol)"
+                  />
+                } @else {
+                  <p-button
+                    icon="pi pi-check"
+                    [text]="true"
+                    severity="success"
+                    pTooltip="Activar"
+                    (onClick)="confirmarActivar(rol)"
+                  />
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="empty-message">No hay roles registrados.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </p-card>
+</div>
+
+<p-confirmDialog />
+
+<p-dialog
+  [header]="editandoId() ? 'Editar Rol' : 'Nuevo Rol'"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  [draggable]="false"
+>
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <div class="field">
+      <label for="nombre">Nombre del rol</label>
+      <input
+        id="nombre"
+        type="text"
+        pInputText
+        formControlName="nombre"
+        placeholder="Ej: Administrador"
+        class="w-full"
+        [class.ng-invalid]="nombre.invalid && nombre.touched"
+      />
+      @if (nombre.touched) {
+        @if (nombre.errors?.['required']) {
+          <small class="error">El nombre es obligatorio.</small>
+        } @else if (nombre.errors?.['maxlength']) {
+          <small class="error">Máximo 50 caracteres.</small>
+        }
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      [text]="true"
+      severity="secondary"
+      (onClick)="dialogVisible.set(false)"
+    />
+    <p-button
+      label="Guardar"
+      icon="pi pi-save"
+      [loading]="loading()"
+      [disabled]="form.invalid"
+      (onClick)="guardar()"
+    />
+  </ng-template>
+</p-dialog>

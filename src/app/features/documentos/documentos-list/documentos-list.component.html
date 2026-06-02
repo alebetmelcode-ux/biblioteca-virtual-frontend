@@ -1,0 +1,212 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Documentos</h1>
+      <p>Biblioteca de documentos y materiales de estudio</p>
+    </div>
+    @if (isAdmin) {
+      <p-button
+        label="Nuevo Documento"
+        icon="pi pi-plus"
+        (onClick)="abrirNuevo()"
+      />
+    }
+  </div>
+
+  <p-card>
+    <div class="table-toolbar">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          type="text"
+          pInputText
+          placeholder="Buscar por título, autor o categoría..."
+          [value]="busqueda()"
+          (input)="busqueda.set($any($event.target).value)"
+        />
+      </p-iconfield>
+    </div>
+
+    @if (loading()) {
+      <div class="skeleton-table">
+        @for (item of [1,2,3,4,5]; track item) {
+          <div class="skeleton-row">
+            <p-skeleton width="12rem" height="1.2rem" />
+            <p-skeleton width="8rem" height="1.2rem" />
+            <p-skeleton width="8rem" height="1.2rem" />
+            <p-skeleton width="5rem" height="1.2rem" />
+            <p-skeleton width="5rem" height="1.2rem" borderRadius="16px" />
+            <p-skeleton width="7rem" height="1.2rem" />
+          </div>
+        }
+      </div>
+    } @else {
+      <p-table
+        [value]="documentosFiltrados"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        styleClass="p-datatable-striped p-datatable-gridlines"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Categoría</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-doc>
+          <tr>
+            <td>{{ doc.titulo }}</td>
+            <td>{{ doc.autor ?? '—' }}</td>
+            <td>{{ doc.nombreCategoria }}</td>
+            <td>{{ doc.fechaSubida | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <p-tag
+                [value]="doc.estado ? 'Activo' : 'Inactivo'"
+                [severity]="doc.estado ? 'success' : 'danger'"
+              />
+            </td>
+            <td>
+              <div class="actions">
+                <p-button
+                  icon="pi pi-eye"
+                  [text]="true"
+                  severity="info"
+                  pTooltip="Ver documento"
+                  (onClick)="verDocumento(doc)"
+                />
+                @if (isAdmin) {
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    severity="warn"
+                    pTooltip="Editar"
+                    (onClick)="abrirEditar(doc)"
+                  />
+                  @if (doc.estado) {
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      severity="danger"
+                      pTooltip="Desactivar"
+                      (onClick)="confirmarEliminar(doc)"
+                    />
+                  } @else {
+                    <p-button
+                      icon="pi pi-check"
+                      [text]="true"
+                      severity="success"
+                      pTooltip="Activar"
+                      (onClick)="confirmarActivar(doc)"
+                    />
+                  }
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="empty-message">No hay documentos disponibles.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </p-card>
+</div>
+
+<p-confirmDialog />
+
+<p-dialog
+  [header]="esNuevo ? 'Nuevo Documento' : 'Editar Documento'"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '520px' }"
+  [draggable]="false"
+>
+  <form [formGroup]="form">
+    <div class="field">
+      <label>Título</label>
+      <input
+        type="text"
+        pInputText
+        formControlName="titulo"
+        placeholder="Título del documento"
+        class="w-full"
+        [class.ng-invalid]="titulo.invalid && titulo.touched"
+      />
+      @if (titulo.touched && titulo.errors?.['required']) {
+        <small class="error">El título es obligatorio.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label>Autor <span class="optional">(opcional)</span></label>
+      <input
+        type="text"
+        pInputText
+        formControlName="autor"
+        placeholder="Nombre del autor"
+        class="w-full"
+      />
+    </div>
+
+    <div class="field">
+      <label>Categoría</label>
+      <p-select
+        formControlName="idCategoria"
+        [options]="categorias()"
+        optionLabel="nombre"
+        optionValue="id"
+        placeholder="Seleccione una categoría"
+        styleClass="w-full"
+        [class.ng-invalid]="idCategoria.invalid && idCategoria.touched"
+      />
+      @if (idCategoria.touched && idCategoria.errors?.['required']) {
+        <small class="error">La categoría es obligatoria.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label>Archivo PDF {{ esNuevo ? '' : '(opcional: solo si desea reemplazar)' }}</label>
+      <p-fileupload
+        mode="basic"
+        accept=".pdf"
+        [maxFileSize]="52428800"
+        chooseLabel="Seleccionar PDF"
+        chooseIcon="pi pi-upload"
+        styleClass="w-full"
+        (onSelect)="onArchivoSeleccionado($event)"
+      />
+      @if (archivoSeleccionado()) {
+        <small class="archivo-ok">
+          <i class="pi pi-check-circle"></i>
+          {{ archivoSeleccionado()!.name }}
+        </small>
+      }
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      [text]="true"
+      severity="secondary"
+      (onClick)="dialogVisible.set(false)"
+    />
+    <p-button
+      label="Guardar"
+      icon="pi pi-save"
+      [loading]="loading()"
+      [disabled]="form.invalid"
+      (onClick)="guardar()"
+    />
+  </ng-template>
+</p-dialog>
+
+<app-pdf-viewer />
